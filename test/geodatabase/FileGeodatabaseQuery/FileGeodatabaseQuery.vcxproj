@@ -57,6 +57,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>D:\LocalGit\Repos\libspatialindex\lib\FileGdb32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>FileGDBAPID.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>COPY "$(SolutionDir)*.dll" "$(OutDir)"</Command>
@@ -78,6 +80,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>D:\LocalGit\Repos\libspatialindex\lib\FileGdb32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>FileGDBAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>COPY "$(SolutionDir)*.dll" "$(OutDir)"</Command>
@@ -87,6 +91,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GeodatabaseIndexLoader.h" />
     <ClInclude Include="GeometryFactory.h" />
     <ClInclude Include="SpatialVisitor.h" />
     <ClInclude Include="stdafx.h" />
@@ -94,6 +99,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FileGeodatabaseQuery.cpp" />
+    <ClCompile Include="GeodatabaseIndexLoader.cpp" />
     <ClCompile Include="GeometryFactory.cpp" />
     <ClCompile Include="SpatialVisitor.cpp" />
     <ClCompile Include="stdafx.cpp">

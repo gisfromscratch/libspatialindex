@@ -14,3 +14,6 @@
 
 // Spatial library
 #include <spatialindex/SpatialIndex.h>
+
+// File Geodatabase API
+#include <filegdb/FileGDBAPI.h>

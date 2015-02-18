@@ -56,6 +56,8 @@ int _tmain(int argc, _TCHAR* argv[])
 		spatialIndex->intersectsWithQuery(geometryFactory->createPoint(1, 1), visitor);
 		showStatistics(visitor);
 
+		// Open geodatabase
+
 		cout << *spatialIndex.get();
 	}
 
