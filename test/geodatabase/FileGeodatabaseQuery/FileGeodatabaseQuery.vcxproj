@@ -61,7 +61,13 @@
       <AdditionalDependencies>FileGDBAPID.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>COPY "$(SolutionDir)*.dll" "$(OutDir)"</Command>
+      <Command>REM Copy spatial lib
+COPY "$(SolutionDir)*.dll" "$(OutDir)"
+
+REM Copy FileGDB binaries
+COPY "$(SolutionDir)\lib\FileGdb32\FileGDBAPID.dll" "$(OutDir)"
+
+REM Copy test data</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -84,7 +90,10 @@
       <AdditionalDependencies>FileGDBAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>COPY "$(SolutionDir)*.dll" "$(OutDir)"</Command>
+      <Command>REM Copy spatial lib
+COPY "$(SolutionDir)*.dll" "$(OutDir)"
+
+REM Copy test data</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

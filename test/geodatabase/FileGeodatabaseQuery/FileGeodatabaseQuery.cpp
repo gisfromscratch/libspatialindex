@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 
+#include "GeodatabaseIndexLoader.h"
 #include "GeometryFactory.h"
 #include "SpatialVisitor.h"
 
@@ -57,6 +58,8 @@ int _tmain(int argc, _TCHAR* argv[])
 		showStatistics(visitor);
 
 		// Open geodatabase
+		GeodatabaseIndexLoader loader;
+		loader.loadIntoIndex(spatialIndex.get(), L"..\\..\\testdata\\Querying.gdb");
 
 		cout << *spatialIndex.get();
 	}

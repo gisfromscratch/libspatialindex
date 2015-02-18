@@ -10,7 +10,7 @@ public:
 	GeometryFactory();
 	~GeometryFactory();
 
-	Point createPoint(double x, double y);
+	SpatialIndex::Point createPoint(double x, double y);
 
 private:
 	const static size_t TwoDimensions = 2;
