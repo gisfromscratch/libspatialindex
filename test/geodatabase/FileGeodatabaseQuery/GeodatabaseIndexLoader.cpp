@@ -78,6 +78,23 @@ ISpatialIndex* GeodatabaseIndexLoader::loadIntoIndex(IStorageManager *storageMan
 												}
 												break;
 
+											case GeometryType::geometryPolyline:
+											case GeometryType::geometryPolygon:
+												{
+													FileGDBAPI::MultiPartShapeBuffer *multiBuffer = reinterpret_cast<FileGDBAPI::MultiPartShapeBuffer*>(&buffer);
+													FileGDBAPI::Point *points;
+													int pointCount;
+													if (S_OK == multiBuffer->GetNumPoints(pointCount) && S_OK == multiBuffer->GetPoints(points))
+													{													
+														for (auto pointIndex = 0; pointIndex < pointCount; pointIndex++)
+														{
+															auto location = _geometryFactory.createPoint(points[pointIndex].x, points[pointIndex].y);
+															index->insertData(0, 0, location, oid);
+														}
+													}
+												}
+												break;
+
 											default:
 												break;
 											}

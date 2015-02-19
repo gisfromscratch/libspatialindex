@@ -93,6 +93,9 @@ REM Copy test data</Command>
       <Command>REM Copy spatial lib
 COPY "$(SolutionDir)*.dll" "$(OutDir)"
 
+REM Copy FileGDB binaries
+COPY "$(SolutionDir)\lib\FileGdb32\FileGDBAPI.dll" "$(OutDir)"
+
 REM Copy test data</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
