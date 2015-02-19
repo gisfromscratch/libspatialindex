@@ -1,5 +1,7 @@
 #pragma once
 
+#include "GeometryFactory.h"
+
 using namespace FileGDBAPI;
 using namespace SpatialIndex;
 using namespace std;
@@ -10,6 +12,9 @@ public:
 	GeodatabaseIndexLoader();
 	~GeodatabaseIndexLoader();
 
-	void loadIntoIndex(ISpatialIndex *index, const wstring &geodatabasePath);
+	ISpatialIndex* loadIntoIndex(IStorageManager *storageManager, const wstring &geodatabasePath);
+
+private:
+	GeometryFactory _geometryFactory;
 };
 

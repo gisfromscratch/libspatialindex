@@ -56,12 +56,12 @@ int _tmain(int argc, _TCHAR* argv[])
 		visitor.resetStatistics();
 		spatialIndex->intersectsWithQuery(geometryFactory->createPoint(1, 1), visitor);
 		showStatistics(visitor);
+		cout << *spatialIndex.get() << endl;
 
 		// Open geodatabase
 		GeodatabaseIndexLoader loader;
-		loader.loadIntoIndex(spatialIndex.get(), L"..\\..\\testdata\\Querying.gdb");
-
-		cout << *spatialIndex.get();
+		auto geodatabaseIndex = unique_ptr<ISpatialIndex>(loader.loadIntoIndex(storage.get(), L"..\\..\\testdata\\Querying.gdb"));
+		cout << *geodatabaseIndex.get() << endl;
 	}
 
 	system("PAUSE");
