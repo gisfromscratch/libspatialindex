@@ -6,6 +6,16 @@ using namespace FileGDBAPI;
 using namespace SpatialIndex;
 using namespace std;
 
+class TableStatistic {
+public:
+	TableStatistic() {}
+	~TableStatistic() {}
+	
+	Envelope Extent;
+	int RowCount;
+	wstring TableName;
+};
+
 class GeodatabaseIndexLoader
 {
 public:
@@ -19,5 +29,10 @@ private:
 
 	size_t _indexCapacity;
 	size_t _leafCapacity;
+
+	vector<TableStatistic> _statistics;
+
+	friend ostream& operator<<(ostream& os, const GeodatabaseIndexLoader& instance);
 };
 
+ostream& operator<<(ostream& os, const GeodatabaseIndexLoader& instance);

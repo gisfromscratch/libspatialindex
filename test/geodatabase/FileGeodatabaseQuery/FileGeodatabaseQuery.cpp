@@ -61,7 +61,14 @@ int _tmain(int argc, _TCHAR* argv[])
 		// Open geodatabase
 		GeodatabaseIndexLoader loader;
 		auto geodatabaseIndex = unique_ptr<ISpatialIndex>(loader.loadIntoIndex(storage.get(), L"..\\..\\testdata\\Querying.gdb"));
+		cout << loader << endl;
 		cout << *geodatabaseIndex.get() << endl;
+
+		// USGS Data
+		GeodatabaseIndexLoader usgsLoader;
+		auto usgsIndex = unique_ptr<ISpatialIndex>(usgsLoader.loadIntoIndex(storage.get(), L"..\\..\\..\\..\\..\\..\\USGS\\PADUS1_3.gdb"));
+		cout << usgsLoader << endl;
+		cout << *usgsIndex.get() << endl;
 	}
 
 	system("PAUSE");

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "GeodatabaseIndexLoader.h"
 
+#include <codecvt>
+#include <locale>
 #include <vector>
 
 
@@ -38,10 +40,14 @@ ISpatialIndex* GeodatabaseIndexLoader::loadIntoIndex(IStorageManager *storageMan
 				if (S_OK == geodatabase.OpenTable(childDatasetPath, table))
 				{
 					FileGDBAPI::Envelope extent;
-					if (S_OK == table.GetExtent(extent))
+					int rowCount;
+					if (S_OK == table.GetRowCount(rowCount) && S_OK == table.GetExtent(extent))
 					{
-						auto lowerLeft = _geometryFactory.createPoint(extent.xMin, extent.yMin);
-						auto upperRight = _geometryFactory.createPoint(extent.xMax, extent.yMax);
+						TableStatistic statistic;
+						statistic.Extent = extent;
+						statistic.RowCount = rowCount;
+						statistic.TableName = childDatasetPath;
+						_statistics.push_back(statistic);
 
 						EnumRows rows;
 						if (S_OK == table.Search(L"*", L"1=1", true, rows))
@@ -90,4 +96,18 @@ ISpatialIndex* GeodatabaseIndexLoader::loadIntoIndex(IStorageManager *storageMan
 	}
 	CloseGeodatabase(geodatabase);
 	return index.release();
+}
+
+
+ostream& operator<<(ostream& os, const GeodatabaseIndexLoader& instance)
+{
+	os << "Statistics: [" << endl;
+	for_each(instance._statistics.begin(), instance._statistics.end(), [&] (const TableStatistic &statistic) {
+		auto extent = statistic.Extent;
+		os << "            \tName:\t\t" << wstring_convert<codecvt_utf8<wchar_t>, wchar_t>().to_bytes(statistic.TableName) << endl;
+		os << "            \tExtent: \t{ xmin:" << extent.xMin << ", xmax:" << extent.xMax << ", ymin:" << extent.yMin << ", ymax:" << extent.yMax << " }" << endl;
+		os << "            \tRowCount:\t" << statistic.RowCount << endl;
+	});
+	os << "            ]" << endl;
+	return os;
 }
