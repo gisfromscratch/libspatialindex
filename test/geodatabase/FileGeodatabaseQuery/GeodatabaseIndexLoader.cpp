@@ -4,7 +4,9 @@
 #include <vector>
 
 
-GeodatabaseIndexLoader::GeodatabaseIndexLoader()
+GeodatabaseIndexLoader::GeodatabaseIndexLoader(size_t indexCapacity, size_t leafCapacity) :
+	_indexCapacity(indexCapacity),
+	_leafCapacity(leafCapacity)
 {
 }
 
@@ -17,11 +19,9 @@ GeodatabaseIndexLoader::~GeodatabaseIndexLoader()
 ISpatialIndex* GeodatabaseIndexLoader::loadIntoIndex(IStorageManager *storageManager, const wstring &geodatabasePath)
 {
 	const double FillFactor = 0.7;
-	const size_t IndexCapacity = 10;
-	const size_t LeafCapacity = 10;
 	const size_t Dimension = 2;
 	id_type indexId;
-	auto index = unique_ptr<ISpatialIndex>(RTree::createNewRTree(*storageManager, FillFactor, IndexCapacity, LeafCapacity, Dimension, RTree::RTreeVariant::RV_RSTAR, indexId));
+	auto index = unique_ptr<ISpatialIndex>(RTree::createNewRTree(*storageManager, FillFactor, _indexCapacity, _leafCapacity, Dimension, RTree::RTreeVariant::RV_RSTAR, indexId));
 
 	Geodatabase geodatabase;
 	if (S_OK != OpenGeodatabase(geodatabasePath, geodatabase))
