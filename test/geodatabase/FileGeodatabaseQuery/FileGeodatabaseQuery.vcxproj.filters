@@ -33,6 +33,9 @@
     <ClInclude Include="GeodatabaseIndexLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RowStream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -48,6 +51,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GeodatabaseIndexLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RowStream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

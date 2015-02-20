@@ -5,9 +5,11 @@
 
 #include "GeodatabaseIndexLoader.h"
 #include "GeometryFactory.h"
+#include "RowStream.h"
 #include "SpatialVisitor.h"
 
 
+using namespace FileGDBAPI;
 using namespace SpatialIndex;
 using namespace std;
 
@@ -22,6 +24,27 @@ static void addPointsToIndex(GeometryFactory *factory, ISpatialIndex *index)
 	index->insertData(0, 0, region, id);
 }
 
+static Geodatabase* applyOnTable(const wstring &geodatabasePath, function<void(Table*, wstring &tableName)> action)
+{
+	unique_ptr<Geodatabase> geodatabase(new Geodatabase);
+	if (S_OK == OpenGeodatabase(geodatabasePath, *geodatabase))
+	{
+		vector<wstring> childDatasetPaths;
+		if (S_OK == geodatabase->GetChildDatasets(L"\\", L"Feature Class", childDatasetPaths))
+		{
+			for_each(childDatasetPaths.begin(), childDatasetPaths.end(), [&](wstring &childDatasetPath) {
+				unique_ptr<Table> table(new Table());
+				if (S_OK == geodatabase->OpenTable(childDatasetPath, *table))
+				{
+					action(table.release(), childDatasetPath);
+				}
+			});
+		}
+		return geodatabase.release();
+	}
+	return nullptr;
+}
+
 static void showStatistics(SpatialVisitor &visitor)
 {
 	cout << "Spatial matches:" << endl;
@@ -30,45 +53,60 @@ static void showStatistics(SpatialVisitor &visitor)
 
 int _tmain(int argc, _TCHAR* argv[])
 {
+	if (2 != argc)
+	{
+		wcerr << "  Usage: " << argv[0] << " <path_to_geodatabase_file>" << endl;
+		system("PAUSE");
+		return -1;
+	}
+
+	const wchar_t *pathToGeodatabase = argv[1];
+	vector<Table*> tables;
+
 	// Create a new RTree in memory
 	auto storage = unique_ptr<IStorageManager>(StorageManager::createNewMemoryStorageManager());
 	const double FillFactor = 0.7;
-	const size_t IndexCapacity = 10;
-	const size_t LeafCapacity = 10;
+	const size_t IndexCapacity = 100;
+	const size_t LeafCapacity = 100;
 	const size_t Dimension = 2;
 	{
 		id_type indexId;
-		auto spatialIndex = unique_ptr<ISpatialIndex>(RTree::createNewRTree(*storage, FillFactor, IndexCapacity, LeafCapacity, Dimension, RTree::RTreeVariant::RV_RSTAR, indexId));
-
-		auto geometryFactory = unique_ptr<GeometryFactory>(new GeometryFactory);
-		addPointsToIndex(geometryFactory.get(), spatialIndex.get());
-
-		// Query region
-		SpatialVisitor visitor;
-		auto origin = geometryFactory->createPoint(0, 0);
-		spatialIndex->intersectsWithQuery(origin, visitor);
-		showStatistics(visitor);
-
-		visitor.resetStatistics();
-		spatialIndex->intersectsWithQuery(geometryFactory->createPoint(-1, -1), visitor);
-		showStatistics(visitor);
-
-		visitor.resetStatistics();
-		spatialIndex->intersectsWithQuery(geometryFactory->createPoint(1, 1), visitor);
-		showStatistics(visitor);
-		cout << *spatialIndex.get() << endl;
-
 		// Open geodatabase
-		GeodatabaseIndexLoader loader;
-		auto geodatabaseIndex = unique_ptr<ISpatialIndex>(loader.loadIntoIndex(storage.get(), L"..\\..\\testdata\\Querying.gdb"));
-		cout << loader << endl;
-		cout << *geodatabaseIndex.get() << endl;
+		Geodatabase *geodatabase = applyOnTable(pathToGeodatabase, [&](Table *table, wstring &tableName) {
+			tables.push_back(table);
 
-		// USGS Data
-		GeodatabaseIndexLoader usgsLoader;
-		auto usgsIndex = unique_ptr<ISpatialIndex>(usgsLoader.loadIntoIndex(storage.get(), L"..\\..\\..\\..\\..\\..\\USGS\\PADUS1_3.gdb"));
-		cout << usgsLoader << endl;
-		cout << *usgsIndex.get() << endl;
+			RowStream rowStream(table);
+			auto index = unique_ptr<ISpatialIndex>(RTree::createAndBulkLoadNewRTree(RTree::BulkLoadMethod::BLM_STR, rowStream, *storage, FillFactor, IndexCapacity, LeafCapacity, Dimension, RTree::RTreeVariant::RV_RSTAR, indexId));
+			wcout << "Statistic for " << tableName << endl;
+			cout << *index.get() << endl;
+		});
+
+		if (0 == tables.size())
+		{
+			wcerr << "  Geodatabase at " << pathToGeodatabase << " has no feature classes!" << endl;
+		}
+		else
+		{
+			for_each(tables.begin(), tables.end(), [&](Table *table) {
+				if (nullptr != geodatabase)
+				{
+					if (nullptr != table)
+					{
+						geodatabase->CloseTable(*table);
+						delete table;
+						table = nullptr;
+					}
+				}
+			});
+			tables.clear();
+		}
+
+		if (nullptr != geodatabase)
+		{
+			CloseGeodatabase(*geodatabase);
+			delete geodatabase;
+			geodatabase = nullptr;
+		}
 	}
 
 	system("PAUSE");

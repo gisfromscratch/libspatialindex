@@ -7,6 +7,7 @@
 
 #include "targetver.h"
 
+#include <functional>
 #include <memory>
 #include <stdio.h>
 #include <tchar.h>

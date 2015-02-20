@@ -105,6 +105,7 @@ REM Copy test data</Command>
   <ItemGroup>
     <ClInclude Include="GeodatabaseIndexLoader.h" />
     <ClInclude Include="GeometryFactory.h" />
+    <ClInclude Include="RowStream.h" />
     <ClInclude Include="SpatialVisitor.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -113,6 +114,7 @@ REM Copy test data</Command>
     <ClCompile Include="FileGeodatabaseQuery.cpp" />
     <ClCompile Include="GeodatabaseIndexLoader.cpp" />
     <ClCompile Include="GeometryFactory.cpp" />
+    <ClCompile Include="RowStream.cpp" />
     <ClCompile Include="SpatialVisitor.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
