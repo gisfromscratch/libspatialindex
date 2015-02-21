@@ -4,8 +4,10 @@
 
 RowStream::RowStream(Table *table) :
 	_table(table),
-	_nextData(nullptr)
+	_nextData(nullptr),
+	_rowCount(0)
 {
+	cout << "RowStream: Intializing" << endl;
 	rewind();
 }
 
@@ -35,6 +37,10 @@ IData* RowStream::getNext()
 
 bool RowStream::hasNext()
 {
+	if (nullptr == _nextData)
+	{
+		cout << "RowStream: " << _rowCount << " rows processed" << endl;
+	}
 	return nullptr != _nextData;
 }
 
@@ -91,6 +97,7 @@ void RowStream::readNextRow()
 								auto upperRight = _geometryFactory.createPoint(point->x + Eps, point->y + Eps);
 								Region region(lowerLeft, upperRight);
 								_nextData = new RTree::Data(0, 0, region, oid);
+								_rowCount++;
 							}
 						}
 						break;
@@ -103,13 +110,43 @@ void RowStream::readNextRow()
 							int pointCount;
 							if (S_OK == multiBuffer->GetNumPoints(pointCount) && S_OK == multiBuffer->GetPoints(points))
 							{
+								double xmin, ymin, xmax, ymax;
 								for (auto pointIndex = 0; pointIndex < pointCount; pointIndex++)
 								{
-									auto lowerLeft = _geometryFactory.createPoint(points[pointIndex].x - Eps, points[pointIndex].y - Eps);
-									auto upperRight = _geometryFactory.createPoint(points[pointIndex].x + Eps, points[pointIndex].y + Eps);
-									Region region(lowerLeft, upperRight);
-									_nextData = new RTree::Data(0, 0, region, oid);
+									auto point = points[pointIndex];
+									if (0 == pointIndex)
+									{
+										xmin = point.x;
+										ymin = point.y;
+										xmax = point.x;
+										ymax = point.y;
+									}
+									else
+									{
+										if (point.x < xmin)
+										{
+											xmin = point.x;
+										}
+										if (point.y < ymin)
+										{
+											ymin = point.y;
+										}
+										if (xmax < point.x)
+										{
+											xmax = point.x;
+										}
+										if (ymax < point.y)
+										{
+											ymax = point.y;
+										}
+									}
 								}
+
+								auto lowerLeft = _geometryFactory.createPoint(xmin - Eps, ymin - Eps);
+								auto upperRight = _geometryFactory.createPoint(xmax + Eps, ymax + Eps);
+								Region region(lowerLeft, upperRight);
+								_nextData = new RTree::Data(0, 0, region, oid);
+								_rowCount++;
 							}
 						}
 						break;

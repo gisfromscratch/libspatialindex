@@ -30,5 +30,6 @@ private:
 	Table *_table;
 	EnumRows _rows;
 	RTree::Data *_nextData;
+	int _rowCount;
 };
 
